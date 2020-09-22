@@ -1,5 +1,5 @@
 import json
-from .ctor import MDDoc
+from postdown.ctor import MDDoc
 
 
 def get_rows(raw, keys):
@@ -12,7 +12,7 @@ def get_rows(raw, keys):
 def parse(in_file, out_file):
     doc = MDDoc()
 
-    with open(in_file) as f:
+    with open(in_file, encoding='utf-8') as f:
         collection = json.load(f)
 
     # The basic info.
@@ -24,8 +24,9 @@ def parse(in_file, out_file):
 
     # API
     for folder in collection['item']:
-        for api in folder['item']:
-            print("API: ", api)
+            api = folder
+        # for api in folder['item']:
+            # print("API: ", api)
             doc.title(api['name'], 2)
             request = api['request']
             url = request['url']['raw'] if isinstance(request['url'], dict) \
@@ -49,7 +50,7 @@ def parse(in_file, out_file):
                 doc.table(['Key', 'Value', 'Description'], rows)
 
             # Request Header
-            if request['header']:
+            if request.get('header'):
                 doc.bold('Header')
                 rows = get_rows(
                     request['header'],
@@ -58,7 +59,7 @@ def parse(in_file, out_file):
                 doc.table(['Key', 'Value', 'Description'], rows)
 
             # Request Body
-            if request['body']:
+            if request.get('body'):
                 content = request['body'][request['body']['mode']]
                 if request['body']['mode'] == 'file' and isinstance(content, dict):
                     content = content.get('src', '')
@@ -155,5 +156,5 @@ def parse(in_file, out_file):
             doc.comment_end()
             doc.hr()
 
-    with open(out_file, 'w+') as f:
+    with open(out_file, 'w+', encoding='utf-8') as f:
         f.write(doc.output())

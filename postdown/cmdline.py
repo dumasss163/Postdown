@@ -1,6 +1,6 @@
 import sys
 from os.path import basename, splitext
-from .parser import parse
+from postdown.parser import parse
 
 
 def execute():
